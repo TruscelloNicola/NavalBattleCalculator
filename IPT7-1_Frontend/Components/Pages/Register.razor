@@ -1,0 +1,153 @@
+﻿@page "/register"
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<PageTitle>Register</PageTitle>
+<div class="background">
+    <div class="login-container">
+        <div class="login-title">
+            <h2>Register</h2>
+        </div>
+        <EditForm Model="@model" OnValidSubmit="ActivateSession" FormName="LoginForm">
+            <div class="login-inputs">
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <InputText type="text" id="username" placeholder="Enter your username" @bind-Value="model.Username"/>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <InputText type="password" id="password" placeholder="Enter your password" @bind-Value="model.Password" />
+                </div>
+            </div>
+            <button type="submit" class="login-button" style="width:100%">Register</button>
+        </EditForm>
+        <a href="/" style="margin-top:30px">Already have an account?</a>
+        @if (errorMSG)
+        {
+            <p style="color:red;">User already exists!</p>
+        }
+    </div>
+</div>
+
+<style>
+    .background {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+/*         background-color: #f0f2f5; */
+        background-color: rgba(248, 249, 250, 0.2);
+        border-radius: 5px;
+        margin: 15px;
+    }
+
+    .login-container {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        width: 100%;
+    }
+
+    .login-title {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+        .login-title h2 {
+            margin: 0;
+            font-size: 24px;
+            color: #333;
+        }
+
+    .login-inputs {
+        margin-bottom: 1.5rem;
+    }
+
+    .input-group {
+        margin-bottom: 1rem;
+    }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+    .login-actions {
+        text-align: center;
+    }
+
+    .login-button, .create-account-button {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .login-button {
+        background-color: #007bff;
+        color: white;
+        margin-right: 1rem;
+    }
+
+        .login-button:hover {
+            background-color: #0056b3;
+        }
+
+    .create-account-button {
+        background-color: #6c757d;
+        color: white;
+    }
+
+        .create-account-button:hover {
+            background-color: #5a6268;
+        }
+
+    body {
+        background-image: url('../SubWallpaper.png');
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: 100% 100%;
+    }
+</style>
+
+@code {
+    public bool errorMSG = false;
+    LoginModel model = new LoginModel();
+    private async Task ActivateSession()
+    {
+        var logins = DBController.SingleInstance.ReadAllUserLogins();
+
+        var result = logins.Find(e => e.UserName == model.Username && e.UserPassword == model.Password);
+
+        if (result == null)
+        {
+            DBController.SingleInstance.InsertUserLogin(model.Username, model.Password);
+
+            Navigation.NavigateTo("/");
+        }
+        else
+        {
+            errorMSG = true;
+        }
+    }
+    public class LoginModel
+    {
+        public string Username { get; set; }
+        public string Password { get; set; }
+    }
+
+}

@@ -1,0 +1,489 @@
+﻿@page "/Home"
+@inherits SessionManager
+@rendermode InteractiveServer
+@using System.Collections.ObjectModel
+@inject GlobalVars GlobalState
+<PageTitle>Home</PageTitle>
+
+<style>
+    .wholepage {
+        padding: 2rem;
+/*         background-color: #f8f9fa; */
+        background-color: rgba(248, 249, 250, 0.2);
+        border-radius: 5px;
+        margin: 15px;
+    }
+
+    .TitleCard {
+        text-align: center;
+        margin-bottom: 2rem;
+        background-color: rgba(248, 249, 250, 0.6);
+        padding: 40px;
+        max-width: 50%;
+        border-radius: 5px
+    }
+
+    .custom-col {
+        padding: 0.5rem;
+        border: 1px solid #dee2e6;
+    }
+
+    .custom-col-label {
+        padding: 0.5rem;
+        border: 1px solid #dee2e6;
+        background: #969696;
+        color: #fff;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .btn-group {
+        margin-bottom: 2rem;
+    }
+
+    .MainPage, .Enemy, form {
+        margin-bottom: 2rem;
+    }
+
+    .list-group-item {
+        margin-bottom: 1rem;
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+        padding: 1rem;
+    }
+
+    .form-group label {
+        font-weight: bold;
+    }
+
+    .form-control {
+        margin-bottom: 1rem;
+    }
+
+    .table-fixed-header {
+        position: sticky;
+        top: 0;
+        background: #969696;
+        color: #fff;
+        z-index: 1;
+    }
+
+    body{
+        background-image: url('../SubWallpaper.png');
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: 100% 100%;
+    }
+
+    .container {
+        margin: 20px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: rgba(255, 255, 255, 0.8);
+    }
+
+    .title {
+        font-size: 1.5em;
+        margin-bottom: 10px;
+    }
+
+    .input-group {
+        margin-bottom: 10px;
+    }
+</style>
+
+<div class="wholepage">
+    <div style="display: flex;align-items: center;flex-direction: column;">
+    <div class="TitleCard" >
+        <h1 >HOI4 Seemacht Rechner</h1>
+        <Button @onclick="(e => SaveUserConfig())" class="btn btn-secondary">Save</Button>
+        <Button @onclick="(e => LoadUserConfig())" class="btn btn-secondary">Load</Button>
+    </div>
+    <div class="TitleCard">
+        <Button @onclick="(e => ExecuteAlgo())" class="btn btn-secondary">Calculate Supremacy</Button>
+        <input readonly @bind="supremacy"></input>
+        <Button @onclick="(e => ExecuteSeaBattle())" class="btn btn-secondary">Calculate Seabattle</Button>
+    </div>
+    </div>
+    <div class="MainPage">
+        <div class="list-group">
+            <div class="list-group-item">
+                <label><h4>Ally Team</h4></label>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="custom-col-label">Name</th>
+                                <th class="custom-col-label">Manpower</th>
+                                <th class="custom-col-label">Surfacedetection</th>
+                                <th class="custom-col-label">SubDetection</th>
+                                <th class="custom-col-label">SurfaceVisibility</th>
+                                <th class="custom-col-label">LightAttack</th>
+                                <th class="custom-col-label">LightPiercing</th>
+                                <th class="custom-col-label">Torpedoattack</th>
+                                <th class="custom-col-label">Depthcharges</th>
+                                <th class="custom-col-label">Anti-air</th>
+                                <th class="custom-col-label">MaxSpeed</th>
+                                <th class="custom-col-label">MaxRange</th>
+                                <th class="custom-col-label">HP</th>
+                                <th class="custom-col-label">Armor</th>
+                                <th class="custom-col-label">Reliability</th>
+                                <th class="custom-col-label">FuelUsage</th>
+                                <th class="custom-col-label">Productioncost</th>
+                                <th class="custom-col-label">LightBatteryhitchance</th>
+                                <th class="custom-col-label">HeavyBatteryhitchance</th>
+                                <th class="custom-col-label">Torpedohitchance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var Ally in Allies)
+                            {
+                                <tr>
+                                    <td class="custom-col">@Ally.Name</td>
+                                    <td class="custom-col">@Ally.Manpower</td>
+                                    <td class="custom-col">@Ally.SurfaceDetection</td>
+                                    <td class="custom-col">@Ally.SubDetection</td>
+                                    <td class="custom-col">@Ally.SurfaceVisibility</td>
+                                    <td class="custom-col">@Ally.LightAttack</td>
+                                    <td class="custom-col">@Ally.LightPiercing</td>
+                                    <td class="custom-col">@Ally.TorpedoAttack</td>
+                                    <td class="custom-col">@Ally.DepthCharges</td>
+                                    <td class="custom-col">@Ally.AntiAir</td>
+                                    <td class="custom-col">@Ally.MaxSpeed</td>
+                                    <td class="custom-col">@Ally.MaxRange</td>
+                                    <td class="custom-col">@Ally.HP</td>
+                                    <td class="custom-col">@Ally.Armor</td>
+                                    <td class="custom-col">@Ally.Reliability</td>
+                                    <td class="custom-col">@Ally.FuelUsage</td>
+                                    <td class="custom-col">@Ally.ProductionCost</td>
+                                    <td class="custom-col">@Ally.LightBatteryHitChance</td>
+                                    <td class="custom-col">@Ally.HeavyBatteryHitChance</td>
+                                    <td class="custom-col">@Ally.TorpedoHitChance</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="Enemy">
+        <div class="list-group">
+            <div class="list-group-item">
+                <label><h4>Enemy Team</h4></label>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="custom-col-label">Name</th>
+                                <th class="custom-col-label">Manpower</th>
+                                <th class="custom-col-label">Surfacedetection</th>
+                                <th class="custom-col-label">SubDetection</th>
+                                <th class="custom-col-label">SurfaceVisibility</th>
+                                <th class="custom-col-label">LightAttack</th>
+                                <th class="custom-col-label">LightPiercing</th>
+                                <th class="custom-col-label">Torpedoattack</th>
+                                <th class="custom-col-label">Depthcharges</th>
+                                <th class="custom-col-label">Anti-air</th>
+                                <th class="custom-col-label">MaxSpeed</th>
+                                <th class="custom-col-label">MaxRange</th>
+                                <th class="custom-col-label">HP</th>
+                                <th class="custom-col-label">Armor</th>
+                                <th class="custom-col-label">Reliability</th>
+                                <th class="custom-col-label">FuelUsage</th>
+                                <th class="custom-col-label">Productioncost</th>
+                                <th class="custom-col-label">LightBatteryhitchance</th>
+                                <th class="custom-col-label">HeavyBatteryhitchance</th>
+                                <th class="custom-col-label">Torpedohitchance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var Enemy in Enemies)
+                            {
+                                <tr>
+                                    <td class="custom-col">@Enemy.Name</td>
+                                    <td class="custom-col">@Enemy.Manpower</td>
+                                    <td class="custom-col">@Enemy.SurfaceDetection</td>
+                                    <td class="custom-col">@Enemy.SubDetection</td>
+                                    <td class="custom-col">@Enemy.SurfaceVisibility</td>
+                                    <td class="custom-col">@Enemy.LightAttack</td>
+                                    <td class="custom-col">@Enemy.LightPiercing</td>
+                                    <td class="custom-col">@Enemy.TorpedoAttack</td>
+                                    <td class="custom-col">@Enemy.DepthCharges</td>
+                                    <td class="custom-col">@Enemy.AntiAir</td>
+                                    <td class="custom-col">@Enemy.MaxSpeed</td>
+                                    <td class="custom-col">@Enemy.MaxRange</td>
+                                    <td class="custom-col">@Enemy.HP</td>
+                                    <td class="custom-col">@Enemy.Armor</td>
+                                    <td class="custom-col">@Enemy.Reliability</td>
+                                    <td class="custom-col">@Enemy.FuelUsage</td>
+                                    <td class="custom-col">@Enemy.ProductionCost</td>
+                                    <td class="custom-col">@Enemy.LightBatteryHitChance</td>
+                                    <td class="custom-col">@Enemy.HeavyBatteryHitChance</td>
+                                    <td class="custom-col">@Enemy.TorpedoHitChance</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form>
+        <div class="list-group-item" style="border-radius: 5px;">
+            <div class="form-group">
+                <label for="allyShipType">Select Ally 
+                    Ship Type</label>
+                <select @onchange="HandleSelectionFriendly" class="form-control" id="allyShipType">
+                    @foreach(string type in ships.Keys)
+                    {
+                        <option value="@type">@type</option>
+                    }
+                </select>
+                <div class="form-group">
+                    <label for="allyShip">Select Ally Ship</label>
+                    <select multiple class="form-control" id="allyShip">
+                        @foreach (Ship sh in SelectionListValuesFriendly)
+                        {
+                            <option @onclick="(e => addFriendlyShip(sh))">@sh.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="list-group-item" style="border-radius: 5px;">
+            <div class="form-group">
+                <label for="enemyShipType">Select Enemy Ship Type</label>
+                    <select @onchange="HandleSelectionEnemy" class="form-control" id="enemyShipType">
+                        @foreach (var type in ships.Keys)
+                        {
+                            <option value="@type">@type</option>
+                        }
+                    </select>
+                <div class="form-group">
+                    <label for="enemyShip">Select Enemy Ship</label>
+                    <select  multiple class="form-control" id="enemyShip">
+                        @foreach (Ship sh in SelectionListValuesEnemy)
+                        {
+                            <option @onclick="(e => addEnemyShip(sh))">@sh.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="list-group-item" style="border-radius: 5px;">
+        <div class="title">Best case for friendly side</div>
+        <div class="form-group">
+            <label for="input1-1">Surviving ships 1:</label>
+            <input type="text" id="input1-1" class="form-control" @bind="outcomeBattle.BestCaseSideA.SurvivingShips" readonly>
+        </div>
+        <div class="form-group">
+            <label for="input1-2">Manpower loss:</label>
+            <input type="text" id="input1-2" class="form-control" @bind="outcomeBattle.BestCaseSideA.TotalManpowerLost" readonly>
+        </div>
+        <div class="form-group">
+            <label for="input1-3">Ship loss:</label>
+            <input type="text" id="input1-3" class="form-control" @bind="outcomeBattle.BestCaseSideA.TotalShipsLost" readonly>
+        </div>
+    </div>
+
+    <div class="list-group-item" style="border-radius: 5px;">
+        <div class="title">Worst case for friendly side</div>
+        <div class="form-group">
+            <label for="input2-1">Surviving ships:</label>
+            <input type="text" id="input2-1" class="form-control" @bind="outcomeBattle.WorstCaseSideA.SurvivingShips" readonly>
+        </div>
+        <div class="form-group">
+            <label for="input2-2">Manpower loss:</label>
+            <input type="text" id="input2-2" class="form-control" @bind="outcomeBattle.WorstCaseSideA.TotalManpowerLost" readonly>
+        </div>
+        <div class="form-group">
+            <label for="input2-3">Ship loss:</label>
+            <input type="text" id="input2-3" class="form-control" @bind="outcomeBattle.WorstCaseSideA.TotalShipsLost" readonly>
+        </div>
+    </div>
+
+    <div class="list-group-item" style="border-radius: 5px;">
+        <div class="title">Best case for enemy side</div>
+        <div class="form-group">
+            <label for="input1-1">Surviving ships:</label>
+            <input type="text" id="input1-1" class="form-control" @bind="outcomeBattle.BestCaseSideB.SurvivingShips" readonly>
+        </div>
+        <div class="form-group">
+            <label for="input1-2">Manpower loss:</label>
+            <input type="text" id="input1-2" class="form-control" @bind="outcomeBattle.BestCaseSideB.TotalManpowerLost" readonly>
+        </div>
+        <div class="form-group">
+            <label for="input1-3">Ship loss:</label>
+            <input type="text" id="input1-3" class="form-control" @bind="outcomeBattle.BestCaseSideB.TotalShipsLost" readonly>
+        </div>
+    </div>
+
+    <div class="list-group-item" style="border-radius: 5px;">
+        <div class="title">Worst case for friendly side</div>
+        <div class="form-group">
+            <label for="input2-1">Surviving ships:</label>
+            <input type="text" id="input2-1" class="form-control" @bind="outcomeBattle.WorstCaseSideB.SurvivingShips" readonly>
+        </div>
+        <div class="form-group">
+            <label for="input2-2">Manpower loss:</label>
+            <input type="text" id="input2-2" class="form-control" @bind="outcomeBattle.WorstCaseSideB.TotalManpowerLost" readonly>
+        </div>
+        <div class="form-group">
+            <label for="input2-3">Ship loss:</label>
+            <input type="text" id="input2-3" class="form-control" @bind="outcomeBattle.WorstCaseSideB.TotalShipsLost" readonly>
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    // Define your list items here
+    List<Ship> Allies = new List<Ship> ();
+    List<Ship> Enemies = new List<Ship>();
+
+    BattleOutcome outcomeBattle = new BattleOutcome();
+
+    double supremacy = 0; 
+
+    Dictionary<string, List<Ship>> ships = DBController.SingleInstance.ReadAllSortedShips();
+
+    public ObservableCollection<Ship> SelectionListValuesFriendly = new ObservableCollection<Ship>();
+    public ObservableCollection<Ship> SelectionListValuesEnemy = new ObservableCollection<Ship>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        SelectionListValuesFriendly = new ObservableCollection<Ship>(ships["Screening Group"]);
+        SelectionListValuesEnemy = new ObservableCollection<Ship>(ships["Screening Group"]);
+    }
+
+    private void HandleSelectionFriendly(ChangeEventArgs e)
+    {
+        selectShipTypeFriendly(e.Value.ToString());
+    }
+
+    private void HandleSelectionEnemy(ChangeEventArgs e)
+    {
+        selectShipTypeEnemy(e.Value.ToString());
+    }
+
+    async Task selectShipTypeFriendly(string type)
+    {
+        SelectionListValuesFriendly = new ObservableCollection<Ship>(ships[type]);
+        StateHasChanged();
+    }
+
+    async Task selectShipTypeEnemy(string type)
+    {
+        SelectionListValuesEnemy = new ObservableCollection<Ship>(ships[type]);
+        StateHasChanged();
+    }
+
+    async Task addFriendlyShip(Ship Ship)
+    {
+        Allies.Add(Ship);
+    }
+    async Task addEnemyShip(Ship Ship)
+    {
+        Enemies.Add(Ship);
+    }
+
+    async Task LoadUserConfig()
+    {
+        Allies = new List<Ship>();
+        Enemies = new List<Ship>();
+
+        var result = DBController.SingleInstance.ReadAllUserLogins();
+
+        var selResult = result.Find(e => e.UserName == GlobalState.UserLogin.UserName && e.UserPassword == GlobalState.UserLogin.UserPassword);
+
+        if (selResult.SaveSlot == null) return;
+
+        var selSave = DBController.SingleInstance.ReadAllSavesForUser(selResult).First();
+
+        var SaveContainsShips = DBController.SingleInstance.ReadAllSavesToShip(selSave);
+
+        var ships = DBController.SingleInstance.ReadAllShips();
+
+        foreach (SaveContainsShip instance in SaveContainsShips)
+        {
+            if (instance.Side == "Enemy")
+            {
+                for (int i = 1; i <= instance.Amount; i++)
+                {
+                    Enemies.Add(ships.Find(e => e._id == instance.ShipId));
+                }
+            }
+            else if (instance.Side == "Friendly")
+            {
+                for (int i = 1; i <= instance.Amount; i++)
+                {
+                    Allies.Add(ships.Find(e => e._id == instance.ShipId));
+                }
+            }
+        }
+    }
+
+    async Task SaveUserConfig()
+    {
+        var userlogin = DBController.SingleInstance.ReadUserLogin(GlobalState.UserLogin.UserName, GlobalState.UserLogin.UserPassword);
+
+        DBController.SingleInstance.DeleteAllSaves(userlogin);
+
+        SaveSlot insertedSave = DBController.SingleInstance.InsertSave(userlogin);
+
+        DBController.SingleInstance.InsertSaveToShip(Allies, "Friendly", insertedSave);
+        DBController.SingleInstance.InsertSaveToShip(Enemies, "Enemy", insertedSave);
+    }
+
+    async Task ExecuteAlgo()
+    {
+        double friendlySupremacy = 0;
+        double enemySupremacy = 0;
+
+        foreach(Ship sh in Allies)
+        {
+            friendlySupremacy += 100 + (double)sh.ProductionCost * 0.005 + (double)sh.Manpower * 0.05;
+        }
+
+        foreach (Ship sh in Enemies)
+        {
+            enemySupremacy += 100 + (double)sh.ProductionCost * 0.005 + (double)sh.Manpower * 0.05;
+        }
+
+        supremacy = friendlySupremacy / (friendlySupremacy + enemySupremacy) * 100;
+
+        Console.WriteLine(supremacy);
+    }
+
+    async Task ExecuteSeaBattle()
+    {
+        var preListAlly = Allies;
+        var preListEnemy = Enemies;
+
+        List<AlgoShip> convertedAllies = new List<AlgoShip>();
+        List<AlgoShip> convertedEnemies = new List<AlgoShip>();
+
+        foreach (Ship ally in preListAlly)
+        {
+            convertedAllies.Add(new AlgoShip(ally));
+        }
+        foreach (Ship enemy in preListEnemy)
+        {
+            convertedEnemies.Add(new AlgoShip(enemy));
+        }
+
+        // Group ships by country and type, then calculate averages
+        var sideA = convertedAllies.GroupBy(s => s.GetType()).Select(g => BattleSimulator.CalculateShipAverage(g.ToList())).ToList();
+        var sideB = convertedEnemies.GroupBy(s => s.GetType()).Select(g => BattleSimulator.CalculateShipAverage(g.ToList())).ToList();
+
+        outcomeBattle = BattleSimulator.SimulateBattle(sideA, sideB);
+    }
+}
